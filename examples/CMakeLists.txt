@@ -29,24 +29,24 @@ if (cisst_FOUND_AS_REQUIRED)
   # load cisst configuration
   include (${CISST_USE_FILE})
 
-  # sawJR3 has been compiled within cisst, we should find it automatically
-  find_package (sawJR3 REQUIRED HINTS "${cisst_saw_BINARY_DIR}/saw/components")
+  # sawJR3ForceSensor has been compiled within cisst, we should find it automatically
+  find_package (sawJR3ForceSensor REQUIRED HINTS "${cisst_saw_BINARY_DIR}/saw/components")
 
-  if (sawJR3_FOUND)
+  if (sawJR3ForceSensor_FOUND)
 
-    # sawJR3 configuration
-    include_directories (${sawJR3_INCLUDE_DIR})
-    link_directories (${sawJR3_LIBRARY_DIR})
+    # sawJR3ForceSensor configuration
+    include_directories (${sawJR3ForceSensor_INCLUDE_DIR})
+    link_directories (${sawJR3ForceSensor_LIBRARY_DIR})
 
-    add_executable (sawJR3Example main.cpp)
+    add_executable (sawJR3ForceSensorExample main.cpp)
 
     # link against non cisst libraries and cisst components
-    target_link_libraries (sawJR3Example ${sawJR3_LIBRARIES})
+    target_link_libraries (sawJR3ForceSensorExample sawJR3ForceSensor ${sawJR3ForceSensor_LIBRARIES})
 
     # link against cisst libraries (and dependencies)
-    cisst_target_link_libraries (sawJR3Example ${REQUIRED_CISST_LIBRARIES})
+    cisst_target_link_libraries (sawJR3ForceSensorExample ${REQUIRED_CISST_LIBRARIES})
 
-  endif (sawJR3_FOUND)
+  endif (sawJR3ForceSensor_FOUND)
 else (cisst_FOUND_AS_REQUIRED)
   cisst_information_message_missing_libraries (${REQUIRED_CISST_LIBRARIES})
 endif (cisst_FOUND_AS_REQUIRED)

@@ -38,11 +38,11 @@ if (cisst_FOUND_AS_REQUIRED)
     #include_directories("/usr/local/src/comedi/comedi/comedi/drivers")
   endif (IS_QNX)
 
-  target_link_libraries (sawJR3ForceSensor ${JR3_LIBRARIES})
+  target_link_libraries (sawJR3ForceSensor ${COMEDI_LIBRARIES})
 
   set (sawJR3ForceSensor_INCLUDE_DIR "${sawComponents_SOURCE_DIR}")
   set (sawJR3ForceSensor_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}")
-  set (sawJR3ForceSensor_LIBRARIES sawJR3ForceSensor ${JR3_LIBRARIES})
+  set (sawJR3ForceSensor_LIBRARIES sawJR3ForceSensor ${COMEDI_LIBRARIES})
 
   configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/sawJR3ForceSensorConfig.cmake.in"
                   "${sawComponents_BINARY_DIR}/sawJR3ForceSensorConfig.cmake"

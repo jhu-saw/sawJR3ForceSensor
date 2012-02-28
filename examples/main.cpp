@@ -23,7 +23,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsTaskPeriodic.h>
 #include <cisstMultiTask/mtsInterfaceRequired.h>
 
-#include <sawJR3/mtsJR3.h>
+#include <sawJR3ForceSensor/mtsJR3ForceSensor.h>
 #include <comedilib.h>
 
 #if (CISST_OS == CISST_LINUX_XENOMAI)
@@ -39,11 +39,11 @@ class ProbeJR3 : public mtsTaskPeriodic
 public:
     ProbeJR3() : mtsTaskPeriodic("Probe", 100 * cmn_ms, true) {
         mtsInterfaceRequired* required = NULL;
-        required = AddInterfaceRequired(mtsJR3::JR3InterfaceName);
+        required = AddInterfaceRequired(mtsJR3ForceSensor::JR3InterfaceName);
 
         if (required) {
-            required->AddFunction(mtsJR3::JR3CommandNames::ReadRawFT, ReadRawFT);
-            required->AddFunction(mtsJR3::JR3CommandNames::ReadFilteredFT, ReadFilteredFT);
+            required->AddFunction(mtsJR3ForceSensor::JR3CommandNames::ReadRawFT, ReadRawFT);
+            required->AddFunction(mtsJR3ForceSensor::JR3CommandNames::ReadFilteredFT, ReadFilteredFT);
         }
     }
     ~ProbeJR3() {}
@@ -53,7 +53,7 @@ public:
     void Cleanup() {}
     void Run(){ 
         ProcessQueuedEvents();
-        mtsJR3::FTReading w;
+        mtsJR3ForceSensor::FTReading w;
         ReadRawFT(w);
         std::cout << "Filter0: " << w << std::endl;
         ReadFilteredFT(1, w); 
@@ -74,9 +74,9 @@ int main()
     mtsTaskManager * taskManager = mtsTaskManager::GetInstance();
 
 #if (CISST_OS == CISST_LINUX_XENOMAI)
-    mtsJR3 * jr3 = new mtsJR3("JR3", "/dev/comedi0", 0);
+    mtsJR3ForceSensor * jr3 = new mtsJR3ForceSensor("JR3", "/dev/comedi0", 0);
 #elif (CISST_OS == CISST_QNX)
-    mtsJR3 * jr3 = new mtsJR3("JR3");
+    mtsJR3ForceSensor * jr3 = new mtsJR3ForceSensor("JR3");
 #endif
 
     taskManager->AddComponent(jr3);
@@ -84,8 +84,8 @@ int main()
     ProbeJR3 probe;
     taskManager->AddComponent(&probe);
 
-    CONNECT_LOCAL(probe.GetName(), mtsJR3::JR3InterfaceName,
-                  jr3->GetName(), mtsJR3::JR3InterfaceName);
+    CONNECT_LOCAL(probe.GetName(), mtsJR3ForceSensor::JR3InterfaceName,
+                  jr3->GetName(), mtsJR3ForceSensor::JR3InterfaceName);
 
     taskManager->CreateAll();
     taskManager->StartAll();
