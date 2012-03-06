@@ -35,14 +35,13 @@ if (cisst_FOUND_AS_REQUIRED)
   elseif (CISST_HAS_LINUX_XENOMAI)
     add_library (sawJR3ForceSensor ${IS_SHARED} ${JR3_COMMON_FILES}
                                    PCI/JR3PCI_Xenomai.cpp PCI/JR3PCI_Xenomai.h)
-    #include_directories("/usr/local/src/comedi/comedi/comedi/drivers")
   endif (IS_QNX)
 
-  target_link_libraries (sawJR3ForceSensor ${COMEDI_LIBRARIES})
+  target_link_libraries (sawJR3ForceSensor ${COMEDI_LIBRARY})
 
-  set (sawJR3ForceSensor_INCLUDE_DIR "${sawComponents_SOURCE_DIR}")
-  set (sawJR3ForceSensor_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}")
-  set (sawJR3ForceSensor_LIBRARIES sawJR3ForceSensor ${COMEDI_LIBRARIES})
+  set (sawJR3ForceSensor_INCLUDE_DIR ${sawComponents_SOURCE_DIR} ${COMEDI_INCLUDE_DIR})
+  set (sawJR3ForceSensor_LIBRARY_DIR ${LIBRARY_OUTPUT_PATH} ${COMEDI_LIBRARY_DIR})
+  set (sawJR3ForceSensor_LIBRARIES sawJR3ForceSensor comedi)#${COMEDI_LIBRARY})
 
   configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/sawJR3ForceSensorConfig.cmake.in"
                   "${sawComponents_BINARY_DIR}/sawJR3ForceSensorConfig.cmake"

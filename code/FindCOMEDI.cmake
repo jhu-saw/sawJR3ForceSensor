@@ -18,9 +18,10 @@
 # Find Comedi Comedi header and library files
 #
 # This module defines
-# COMEDI_INCLUDE_DIR, where to find comedi.h and comedilib.h
 # COMEDI_FOUND, If false, do not use sawJR3ForceSensor component..
-# COMEDI_LIBRARY, where to find Comedi library (libcomedi)
+# COMEDI_INCLUDE_DIR, where to find comedi.h and comedilib.h
+# COMEDI_LIBRARY, Comedi library (libcomedi)
+# COMEDI_LIBRARY_DIR, where to find Comedi library (e.g. /usr/local/lib) 
 
 # For now sawJR3ForceSensor only supports Xenomai (using Comedi) and QNX 
 # (direct memory mapped access to DSP memory of JR3).
@@ -32,9 +33,9 @@ if (CISST_HAS_LINUX_XENOMAI)
   find_library (COMEDI_LIBRARY comedi "/usr/local/lib")
   if (COMEDI_INCLUDE_DIR)
       if (COMEDI_LIBRARY)
+        set (COMEDI_LIBRARY_DIR "/usr/local/lib")
         set (COMEDI_FOUND "YES")
-        set (COMEDI_LIBRARIES ${COMEDI_LIBRARY})
-        mark_as_advanced (COMEDI_LIBRARIES COMEDI_LIBRARY COMEDI_FOUND COMEDI_INCLUDE_DIR)
+        mark_as_advanced (COMEDI_LIBRARY COMEDI_FOUND COMEDI_INCLUDE_DIR)
     endif (COMEDI_LIBRARY)
   endif (COMEDI_INCLUDE_DIR)
 elseif (IS_QNX)
