@@ -17,7 +17,7 @@
 
 
 # create a list of libraries needed for this project
-set (REQUIRED_CISST_LIBRARIES cisstCommon 
+set (REQUIRED_CISST_LIBRARIES cisstCommon
                               cisstOSAbstraction
                               cisstMultiTask)
 
@@ -30,7 +30,7 @@ if (cisst_FOUND_AS_REQUIRED)
   include (${CISST_USE_FILE})
 
   # sawJR3ForceSensor has been compiled within cisst, we should find it automatically
-  find_package (sawJR3ForceSensor REQUIRED HINTS "${cisst_saw_BINARY_DIR}/saw/components")
+  cisst_find_saw_component (sawJR3ForceSensor REQUIRED)
 
   if (sawJR3ForceSensor_FOUND)
 
