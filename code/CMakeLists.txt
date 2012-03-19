@@ -32,12 +32,12 @@ if (cisst_FOUND_AS_REQUIRED)
   if (IS_QNX)
     add_library (sawJR3ForceSensor ${IS_SHARED} ${JR3_COMMON_FILES}
                                    PCI/JR3PCI_QNX.cpp PCI/JR3PCI_QNX.h)
-  elseif (CISST_HAS_LINUX_XENOMAI)
+  elseif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
     add_library (sawJR3ForceSensor ${IS_SHARED} ${JR3_COMMON_FILES}
-                                   PCI/JR3PCI_Xenomai.cpp PCI/JR3PCI_Xenomai.h)
+      PCI/JR3PCI_Xenomai.cpp PCI/JR3PCI_Xenomai.h)
   endif (IS_QNX)
 
-  target_link_libraries (sawJR3ForceSensor ${COMEDI_LIBRARY})
+  target_link_libraries( sawJR3ForceSensor ${COMEDI_LIBRARY} )
 
   set (sawJR3ForceSensor_INCLUDE_DIR ${sawComponents_SOURCE_DIR} ${COMEDI_INCLUDE_DIR})
   set (sawJR3ForceSensor_LIBRARY_DIR ${LIBRARY_OUTPUT_PATH} ${COMEDI_LIBRARY_DIR})

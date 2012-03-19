@@ -25,23 +25,31 @@
 
 # For now sawJR3ForceSensor only supports Xenomai (using Comedi) and QNX 
 # (direct memory mapped access to DSP memory of JR3).
-if (CISST_HAS_LINUX_XENOMAI)
-  message(STATUS "Building JR3ForceSensor component for Xenomai")
+
+if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+
+  message(STATUS "Building JR3ForceSensor component for Linux")
   find_path (COMEDI_INCLUDE_DIR
-             NAMES comedi.h comedilib.h
-             PATHS "/usr/local/src/comedi/comedi/include/linux")
-  find_library (COMEDI_LIBRARY comedi "/usr/local/lib")
+    NAMES comedi.h comedilib.h
+    PATHS "/usr/local/src/comedi/comedi/include/linux")
+  find_library( COMEDI_LIBRARY comedi )
+
   if (COMEDI_INCLUDE_DIR)
-      if (COMEDI_LIBRARY)
-        set (COMEDI_LIBRARY_DIR "/usr/local/lib")
-        set (COMEDI_FOUND "YES")
-        mark_as_advanced (COMEDI_LIBRARY COMEDI_FOUND COMEDI_INCLUDE_DIR)
+    if (COMEDI_LIBRARY)
+      set (COMEDI_LIBRARY_DIR "/usr/local/lib")
+      set (COMEDI_FOUND "YES")      
+      mark_as_advanced (COMEDI_LIBRARY COMEDI_FOUND COMEDI_INCLUDE_DIR)
     endif (COMEDI_LIBRARY)
   endif (COMEDI_INCLUDE_DIR)
+
 elseif (IS_QNX)
+
   message(STATUS "Building JR3ForceSensor component for QNX")
   # MJ TODO: implement QNX
-else (CISST_HAS_LINUX_XENOMAI)
+
+else( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+
   # other platforms are not supported
-  message(STATUS "Skipped building JR3ForceSensor component: Only QNX and Xenomai are supported")
-endif (CISST_HAS_LINUX_XENOMAI)
+  message( STATUS "Skipped building JR3ForceSensor component: Only QNX and Xenomai are supported")
+
+endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )

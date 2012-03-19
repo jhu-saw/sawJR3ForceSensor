@@ -25,7 +25,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <sawJR3ForceSensor/mtsJR3ForceSensor.h>
 #if (CISST_OS == CISST_QNX)
 //#include <sawJR3/mtsJR3ForceSensorDSP.h>
-#elif (CISST_OS == CISST_LINUX_XENOMAI)
+#elif (CISST_OS == CISST_LINUX_XENOMAI) || (CISST_OS == CISST_LINUX)
 #include <sawJR3ForceSensor/code/PCI/JR3PCI_Xenomai.h>
 #endif
 
@@ -52,14 +52,14 @@ mtsJR3ForceSensor::mtsJR3ForceSensor(const std::string &name) : mtsComponent(nam
 
 #if (CISST_OS == CISST_QNX)
 mtsJR3ForceSensor::mtsJR3ForceSensor(const std::string &name, const PCI_ID deviceId) 
-#elif (CISST_OS == CISST_LINUX_XENOMAI)
+#elif (CISST_OS == CISST_LINUX_XENOMAI) || (CISST_OS == CISST_LINUX)
 mtsJR3ForceSensor::mtsJR3ForceSensor(const std::string &name, const std::string & devicePath, int subdeviceId)
 #endif
     : mtsComponent(name)
 {
 #if (CISST_OS == CISST_QNX)
     PCI = new mtsJR3ForceSensorPCI(deviceId);
-#elif (CISST_OS == CISST_LINUX_XENOMAI)
+#elif (CISST_OS == CISST_LINUX_XENOMAI) || (CISST_OS == CISST_LINUX)
     PCI = new mtsJR3ForceSensorPCI(subdeviceId, devicePath);
 #endif
 

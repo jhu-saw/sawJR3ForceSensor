@@ -73,8 +73,8 @@ int main()
 
     mtsTaskManager * taskManager = mtsTaskManager::GetInstance();
 
-#if (CISST_OS == CISST_LINUX_XENOMAI)
-    mtsJR3ForceSensor * jr3 = new mtsJR3ForceSensor("JR3", "/dev/comedi0", 0);
+#if (CISST_OS == CISST_LINUX_XENOMA) || (CISST_OS == CISST_LINUX)
+    mtsJR3ForceSensor * jr3 = new mtsJR3ForceSensor("JR3", "/dev/comedi4", 0);
 #elif (CISST_OS == CISST_QNX)
     mtsJR3ForceSensor * jr3 = new mtsJR3ForceSensor("JR3");
 #endif

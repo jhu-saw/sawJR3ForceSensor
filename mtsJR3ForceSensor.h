@@ -100,7 +100,7 @@ public:
     mtsJR3ForceSensor(const std::string &name);
 #if (CISST_OS == CISST_QNX)
     mtsJR3ForceSensor(const std::string &name, const PCI_ID deviceId);
-#elif (CISST_OS == CISST_LINUX_XENOMAI)
+#elif (CISST_OS == CISST_LINUX_XENOMAI) || (CISST_OS == CISST_LINUX)
     mtsJR3ForceSensor(const std::string & name, 
            const std::string & devicePath, 
            int subdeviceId);
