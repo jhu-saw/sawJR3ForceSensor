@@ -55,7 +55,9 @@ public:
     public:
 		const static std::string ReadRawFT;
         const static std::string ReadFilteredFT;
-        const static std::string GetError;
+        const static std::string ReadErrorCount;
+        const static std::string ReadWarning;
+        const static std::string ReadError;
     };
 
 	// Typedef for force and torque readings
@@ -90,9 +92,10 @@ protected:
        cutoff at 125 Hz, 31.25 Hz, 7.813 Hz, 1.953 Hz and 0.4883 Hz. */
     void ReadFilteredFT(const int & filterId, FTReading & ft) const;
 
-    /*! Get error code from JR3 */
-    void GetError(unsigned int & errCode) const;
-
+    /*! Get error count, warning, and error from JR3 */
+    void ReadErrorCount(unsigned int & errorCount) const;
+    void ReadWarning(unsigned int & warning) const;
+    void ReadError(unsigned int & error) const;
 
 public:
     /*! Constructors and destructor */

@@ -42,7 +42,9 @@ public:
     void Initialize(void);
 
     mtsJR3ForceSensor::FTReading ReadFilteredFT(int filterId);
-    void GetError(unsigned int & errCode) const;
+    unsigned int ReadErrorCount(void) const;
+    unsigned int ReadWarning(void) const;
+    unsigned int ReadError(void) const;
 };
 
 #endif

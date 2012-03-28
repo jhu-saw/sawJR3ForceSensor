@@ -94,22 +94,85 @@ mtsJR3ForceSensor::FTReading mtsJR3ForceSensorPCI::ReadFilteredFT(int filterId)
             CMN_LOG_RUN_ERROR << "mtsJR3ForceSensorPCI: ReadFilteredFT: Failed to read sample from mtsJR3ForceSensorPCI: " 
                 << SubdeviceId << ", " << channelId << ", " << range << ", " << aref << std::endl;
         } else {
-            ft[i] = ((double) sample) / 16384.0 * (fabs(Ranges[i]->min));
-            /*
-            double a = comedi_to_phys(sample, Ranges[i], 65536);
-            if (NAN == a)
+            //ft[i] = ((double) sample) / 16384.0 * (fabs(Ranges[i]->min));
+            double val = comedi_to_phys(sample, Ranges[i], 32767);
+            if (NAN == val)
                 CMN_LOG_RUN_ERROR << "mtsJR3ForceSensorPCI: ReadFilteredFT: Failed to convert to physical reading" << std::endl;
-            else
-                std::cout << sample << "\t" << ft[i] << "\t" << a << std::endl;
-            */
+            else {
+                //std::cout << sample << "\t" << ft[i] << "\t" << a << std::endl;
+                ft[i] = val * (i <= 2 ? 1e3 : 1e4); // MJ TEMP
+            }
         }
 
     }
     return ft;
 }
 
-void mtsJR3ForceSensorPCI::GetError(unsigned int & errCode) const
+unsigned int mtsJR3ForceSensorPCI::ReadErrorCount(void) const
 {
-    // MJ: not implemented yet
-    errCode = 0;
+    static int channelId = 56;
+    static int range = 0;
+    static int aref = AREF_GROUND;
+
+    lsampl_t errorCount = 0;
+    if (-1 == comedi_data_read(PCIDevice, 
+                               SubdeviceId, 
+                               channelId, 
+                               range, 
+                               aref, 
+                               &errorCount))
+    {
+        errorCount = 0;
+        CMN_LOG_RUN_ERROR << "mtsJR3ForceSensorPCI: ReadErrorCount: Failed to read error count from jr3 module: " 
+            << SubdeviceId << ", " << channelId << ", " << range << ", " << aref << std::endl;
+        return 0;
+    }
+
+    return (unsigned int) errorCount;
+}
+
+unsigned int mtsJR3ForceSensorPCI::ReadWarning(void) const
+{
+    static int channelId = 57;
+    static int range = 0;
+    static int aref = AREF_GROUND;
+
+    lsampl_t warning = 0;
+    if (-1 == comedi_data_read(PCIDevice, 
+                               SubdeviceId, 
+                               channelId, 
+                               range, 
+                               aref, 
+                               &warning))
+    {
+        warning = 0;
+        CMN_LOG_RUN_ERROR << "mtsJR3ForceSensorPCI: ReadWarning: Failed to read warning from jr3 module: " 
+            << SubdeviceId << ", " << channelId << ", " << range << ", " << aref << std::endl;
+        return 0;
+    }
+
+    return (unsigned int) warning;
+}
+
+unsigned int mtsJR3ForceSensorPCI::ReadError(void) const
+{
+    static int channelId = 58;
+    static int range = 0;
+    static int aref = AREF_GROUND;
+
+    lsampl_t error = 0;
+    if (-1 == comedi_data_read(PCIDevice, 
+                               SubdeviceId, 
+                               channelId, 
+                               range, 
+                               aref, 
+                               &error))
+    {
+        error = 0;
+        CMN_LOG_RUN_ERROR << "mtsJR3ForceSensorPCI: ReadErrorCount: Failed to read error from jr3 module: " 
+            << SubdeviceId << ", " << channelId << ", " << range << ", " << aref << std::endl;
+        return 0;
+    }
+
+    return (unsigned int) error;
 }

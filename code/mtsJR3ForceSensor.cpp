@@ -36,7 +36,9 @@ const std::string mtsJR3ForceSensor::JR3InterfaceName = "JR3Interface";
 // Name of standardized commands
 const std::string mtsJR3ForceSensor::JR3CommandNames::ReadRawFT = "ReadRawFT";
 const std::string mtsJR3ForceSensor::JR3CommandNames::ReadFilteredFT = "ReadFilteredFT";
-const std::string mtsJR3ForceSensor::JR3CommandNames::GetError = "GetError";
+const std::string mtsJR3ForceSensor::JR3CommandNames::ReadErrorCount = "ReadErrorCount";
+const std::string mtsJR3ForceSensor::JR3CommandNames::ReadWarning = "ReadWarning";
+const std::string mtsJR3ForceSensor::JR3CommandNames::ReadError = "ReadError";
 
 mtsJR3ForceSensor::mtsJR3ForceSensor(void) : mtsComponent("NONAME"), PCI(0)
 {
@@ -70,7 +72,9 @@ mtsJR3ForceSensor::mtsJR3ForceSensor(const std::string &name, const std::string 
         // sampling rate of 8kHz with different cut-off frequency
         provided->AddCommandRead(&mtsJR3ForceSensor::ReadRawFT, this, mtsJR3ForceSensor::JR3CommandNames::ReadRawFT);
         provided->AddCommandQualifiedRead(&mtsJR3ForceSensor::ReadFilteredFT, this, mtsJR3ForceSensor::JR3CommandNames::ReadFilteredFT);
-        provided->AddCommandRead(&mtsJR3ForceSensor::GetError, this, mtsJR3ForceSensor::JR3CommandNames::GetError);
+        provided->AddCommandRead(&mtsJR3ForceSensor::ReadErrorCount, this, mtsJR3ForceSensor::JR3CommandNames::ReadErrorCount);
+        provided->AddCommandRead(&mtsJR3ForceSensor::ReadWarning, this, mtsJR3ForceSensor::JR3CommandNames::ReadWarning);
+        provided->AddCommandRead(&mtsJR3ForceSensor::ReadError, this, mtsJR3ForceSensor::JR3CommandNames::ReadError);
     }
 }
 
@@ -90,7 +94,17 @@ void mtsJR3ForceSensor::ReadFilteredFT(const int & filterId, FTReading & ft) con
     ft = PCI->ReadFilteredFT(filterId);
 }
 
-void mtsJR3ForceSensor::GetError(unsigned int & errCode) const
+void mtsJR3ForceSensor::ReadErrorCount(unsigned int & errorCount) const
 {
-    PCI->GetError(errCode);
+    errorCount = PCI->ReadErrorCount();
+}
+
+void mtsJR3ForceSensor::ReadWarning(unsigned int & warning) const
+{
+    warning = PCI->ReadWarning();
+}
+
+void mtsJR3ForceSensor::ReadError(unsigned int & error) const
+{
+    error = PCI->ReadError();
 }
