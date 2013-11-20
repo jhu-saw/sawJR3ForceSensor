@@ -15,40 +15,66 @@
 #
 # --- end cisst license ---
 
-set (REQUIRED_CISST_LIBRARIES cisstCommon
+set( REQUIRED_CISST_LIBRARIES cisstCommon
                               cisstVector
                               cisstOSAbstraction
-                              cisstMultiTask)
+                              cisstParameterTypes
+                              cisstMultiTask
+			      cisstRobot )
 
-find_package (cisst REQUIRED ${REQUIRED_CISST_LIBRARIES})
+find_package( cisst REQUIRED ${REQUIRED_CISST_LIBRARIES} )
 
-if (cisst_FOUND_AS_REQUIRED)
+if( cisst_FOUND_AS_REQUIRED )
 
   # load cisst configuration
-  include (${CISST_USE_FILE})
+  include( ${CISST_USE_FILE} )
+  
+  set( sawJR3ForceSensor_INCLUDE_DIR 
+    "${sawJR3ForceSensor_SOURCE_DIR}/include" )
+  set( sawJR3ForceSensor_LIBRARY_DIR 
+    "${LIBRARY_OUTPUT_PATH}")
 
-  # add definition for code
-  set (JR3_COMMON_FILES ../sawJR3ForceSensorExport.h ../mtsJR3ForceSensor.h mtsJR3ForceSensor.cpp)
-  if (IS_QNX)
-    add_library (sawJR3ForceSensor ${IS_SHARED} ${JR3_COMMON_FILES}
-                                   PCI/JR3PCI_QNX.cpp PCI/JR3PCI_QNX.h)
-  elseif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-    add_library (sawJR3ForceSensor ${IS_SHARED} ${JR3_COMMON_FILES}
-      PCI/JR3PCI_Xenomai.cpp PCI/JR3PCI_Xenomai.h)
-  endif (IS_QNX)
+  set( 
+    HEADER_FILE_NAMES 
+    ${sawJR3ForceSensor_SOURCE_DIR}/include/osaJR3ForceSensor.h
+    ${sawJR3ForceSensor_SOURCE_DIR}/include/mtsJR3ForceSensor.h )
+  set( SOURCE_FILES osaJR3ForceSensor.cpp mtsJR3ForceSensor.cpp )
+  
+  add_library( 
+    sawJR3ForceSensor 
+    ${IS_SHARED} 
+    ${HEADER_FILES} 
+    ${SOURCE_FILES} )
+  set_property( 
+    TARGET 
+    sawJR3ForceSensor 
+    PROPERTY FOLDER 
+    "sawJR3ForceSensor" )
 
-  target_link_libraries( sawJR3ForceSensor ${COMEDI_LIBRARY} )
+  if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+    
+    find_package( COMEDI REQUIRED )
+    if( COMEDI_FOUND )
+      
+      set(
+	sawJR3ForceSensor_INCLUDE_DIRS 
+	${sawJR3ForceSensor_INCLUDE_DIR} 
+	${COMEDI_INCLUDE_DIR} )
+      
+      set( sawJR3ForceSensor_LIBRARIES sawJR3ForceSensor ${COMEDI_LIBRARY} )
+      target_link_libraries( sawJR3ForceSensor ${COMEDI_LIBRARY} )
+      
+    endif( COMEDI_FOUND )
 
-  set (sawJR3ForceSensor_INCLUDE_DIR ${sawComponents_SOURCE_DIR} ${COMEDI_INCLUDE_DIR})
-  set (sawJR3ForceSensor_LIBRARY_DIR ${LIBRARY_OUTPUT_PATH} ${COMEDI_LIBRARY_DIR})
-  set (sawJR3ForceSensor_LIBRARIES sawJR3ForceSensor comedi)#${COMEDI_LIBRARY})
+  endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
 
-  configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/sawJR3ForceSensorConfig.cmake.in"
-                  "${sawComponents_BINARY_DIR}/sawJR3ForceSensorConfig.cmake"
-                   @ONLY@)
+  include_directories( ${sawJR3ForceSensor_INCLUDE_DIRS} )
+      
+  configure_file( 
+    "${CMAKE_CURRENT_SOURCE_DIR}/sawJR3ForceSensorConfig.cmake.in"
+    "${sawComponents_BINARY_DIR}/sawJR3ForceSensorConfig.cmake"
+    @ONLY@ )
 
-  cisst_target_link_libraries (sawJR3ForceSensor ${REQUIRED_CISST_LIBRARIES})
+  cisst_target_link_libraries( sawJR3ForceSensor ${REQUIRED_CISST_LIBRARIES} )
 
-else (cisst_FOUND_AS_REQUIRED)
-  message ("Code in ${CMAKE_CURRENT_SOURCE_DIR} will not be compiled since it requires ${REQUIRED_CISST_LIBRARIES}")
 endif (cisst_FOUND_AS_REQUIRED)

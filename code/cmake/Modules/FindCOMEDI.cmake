@@ -18,17 +18,17 @@
 # Find Comedi Comedi header and library files
 #
 # This module defines
-# COMEDI_FOUND, If false, do not use sawJR3ForceSensor component..
+# COMEDI_FOUND, If false, do not use sawJR3 component..
 # COMEDI_INCLUDE_DIR, where to find comedi.h and comedilib.h
 # COMEDI_LIBRARY, Comedi library (libcomedi)
 # COMEDI_LIBRARY_DIR, where to find Comedi library (e.g. /usr/local/lib) 
 
-# For now sawJR3ForceSensor only supports Xenomai (using Comedi) and QNX 
+# For now sawJR3 only supports Xenomai (using Comedi) and QNX 
 # (direct memory mapped access to DSP memory of JR3).
 
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
 
-  message(STATUS "Building JR3ForceSensor component for Linux")
+  message(STATUS "Building JR3 component for Linux")
   find_path (COMEDI_INCLUDE_DIR
     NAMES comedi.h comedilib.h
     PATHS "/usr/local/src/comedi/comedi/include/linux")
@@ -44,12 +44,12 @@ if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
 
 elseif (IS_QNX)
 
-  message(STATUS "Building JR3ForceSensor component for QNX")
+  message(STATUS "Building JR3 component for QNX")
   # MJ TODO: implement QNX
 
 else( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
 
   # other platforms are not supported
-  message( STATUS "Skipped building JR3ForceSensor component: Only QNX and Xenomai are supported")
+  message( STATUS "Skipped building JR3 component: Only QNX and Xenomai are supported")
 
 endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )

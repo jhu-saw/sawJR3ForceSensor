@@ -1,11 +1,11 @@
-/* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-    */
-/* ex: set filetype=cpp softtabstop=4 shiftwidth=4 tabstop=4 cindent expandtab: */
+/*-*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-   */
+/*ex: set filetype=cpp softtabstop=4 shiftwidth=4 tabstop=4 cindent expandtab:*/
 
 /*
-  $Id: mtsJR3ForceSensor.cpp 3181 2011-11-15 15:41:28Z adeguet1 $
+  $Id: mtsJR3ForceSensor.cpp 3181 2011-11-15 15:41:28Z sleonard $
 
-  Author(s):  Min Yang Jung
-  Created on: 2012-02-22
+  Author(s):  Simon Leonard
+  Created on: 2013-07-22
 
   (C) Copyright 2012 Johns Hopkins University (JHU), All Rights Reserved.
 
@@ -18,93 +18,163 @@ http://www.cisst.org/cisst/license.txt.
 --- end cisst license ---
 */
 
-#include <cisstCommon/cmnLogger.h>
-#include <cisstOSAbstraction/osaSleep.h>
+
 #include <cisstMultiTask/mtsInterfaceProvided.h>
-
+#include <cisstMultiTask/mtsInterfaceRequired.h>
+#include <cisstParameterTypes/prmPositionCartesianGet.h>
+#include <cisstParameterTypes/prmPositionJointGet.h>
 #include <sawJR3ForceSensor/mtsJR3ForceSensor.h>
-#if (CISST_OS == CISST_QNX)
-//#include <sawJR3/mtsJR3ForceSensorDSP.h>
-#elif (CISST_OS == CISST_LINUX_XENOMAI) || (CISST_OS == CISST_LINUX)
-#include <sawJR3ForceSensor/code/PCI/JR3PCI_Xenomai.h>
-#endif
 
-CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG(mtsJR3ForceSensor, mtsComponent, std::string)
+CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG( mtsJR3ForceSensor, 
+                                       mtsComponent, 
+                                       std::string )
 
-// Name of standardized interface
-const std::string mtsJR3ForceSensor::JR3InterfaceName = "JR3Interface";
-// Name of standardized commands
-const std::string mtsJR3ForceSensor::JR3CommandNames::ReadRawFT = "ReadRawFT";
-const std::string mtsJR3ForceSensor::JR3CommandNames::ReadFilteredFT = "ReadFilteredFT";
-const std::string mtsJR3ForceSensor::JR3CommandNames::ReadErrorCount = "ReadErrorCount";
-const std::string mtsJR3ForceSensor::JR3CommandNames::ReadWarning = "ReadWarning";
-const std::string mtsJR3ForceSensor::JR3CommandNames::ReadError = "ReadError";
+mtsJR3ForceSensor::mtsJR3ForceSensor( const std::string& name ) : 
+mtsComponent( name )
+{}
 
-mtsJR3ForceSensor::mtsJR3ForceSensor(void) : mtsComponent("NONAME"), PCI(0)
-{
-    // Default constructor shouldn't be used
-    CMN_LOG_INIT_WARNING << "mtsJR3ForceSensor: PCIDevice is not initialized and unavailable" << std::endl;
-}
+mtsJR3ForceSensor::mtsJR3ForceSensor( const std::string& name,
+                                      const std::string& robfile,
+                                      const vctFrame4x4<double>& Rtw0,
+                                      const std::string& devicename,
+                                      osaJR3ForceSensor::Units u,
+                                      const osaJR3ForceSensor::Wrench& bias,
+                                      const vctFrame4x4<double>& Rtst,
+                                      double mass,
+                                      const vctFixedSizeVector<double,3>& com ):
+    mtsComponent( name ),
+    jr3( devicename, u, bias, Rtst, mass, com ),
+    robot( robfile, Rtw0 ){
 
-mtsJR3ForceSensor::mtsJR3ForceSensor(const std::string &name) : mtsComponent(name), PCI(0)
-{
-    // Default constructor shouldn't be used
-    CMN_LOG_INIT_WARNING << "mtsJR3ForceSensor: PCIDevice is not initialized and unavailable" << std::endl;
-}
+    jr3.Open();
 
-#if (CISST_OS == CISST_QNX)
-mtsJR3ForceSensor::mtsJR3ForceSensor(const std::string &name, const PCI_ID deviceId) 
-#elif (CISST_OS == CISST_LINUX_XENOMAI) || (CISST_OS == CISST_LINUX)
-mtsJR3ForceSensor::mtsJR3ForceSensor(const std::string &name, const std::string & devicePath, int subdeviceId)
-#endif
-    : mtsComponent(name)
-{
-#if (CISST_OS == CISST_QNX)
-    PCI = new mtsJR3ForceSensorPCI(deviceId);
-#elif (CISST_OS == CISST_LINUX_XENOMAI) || (CISST_OS == CISST_LINUX)
-    PCI = new mtsJR3ForceSensorPCI(subdeviceId, devicePath);
-#endif
-
-    PCI->Initialize();
-
-    mtsInterfaceProvided * provided = AddInterfaceProvided(mtsJR3ForceSensor::JR3InterfaceName);
-    if (provided) {
-        // sampling rate of 8kHz with different cut-off frequency
-        provided->AddCommandRead(&mtsJR3ForceSensor::ReadRawFT, this, mtsJR3ForceSensor::JR3CommandNames::ReadRawFT);
-        provided->AddCommandQualifiedRead(&mtsJR3ForceSensor::ReadFilteredFT, this, mtsJR3ForceSensor::JR3CommandNames::ReadFilteredFT);
-        provided->AddCommandRead(&mtsJR3ForceSensor::ReadErrorCount, this, mtsJR3ForceSensor::JR3CommandNames::ReadErrorCount);
-        provided->AddCommandRead(&mtsJR3ForceSensor::ReadWarning, this, mtsJR3ForceSensor::JR3CommandNames::ReadWarning);
-        provided->AddCommandRead(&mtsJR3ForceSensor::ReadError, this, mtsJR3ForceSensor::JR3CommandNames::ReadError);
+    mtsInterfaceProvided* output = NULL;
+    output = AddInterfaceProvided( "Output" );
+    if( output != NULL ){ 
+        output->AddCommandRead( &mtsJR3ForceSensor::Read, 
+                                this,
+                                "GetCartesianForceTorque" );
+        output->AddCommandRead( &mtsJR3ForceSensor::ReadTransformed, 
+                                this,
+                                "GetCartesianForceTorqueTransformed" );
+        output->AddCommandRead( &mtsJR3ForceSensor::ReadToolComp, 
+                                this,
+                                "GetCartesianForceTorqueToolCompensation" );
     }
+    else{
+        CMN_LOG_CLASS_RUN_ERROR << "Failed to create the interface Output."
+                                << std::endl;
+    }
+    
+    mtsInterfaceRequired* input = NULL;
+    input = AddInterfaceRequired( "Input", MTS_OPTIONAL );
+    if( input != NULL ){
+        input->AddFunction( "GetPositionJoint", GetRobotJoint );
+    }
+    else{
+        CMN_LOG_CLASS_RUN_ERROR << "Failed to create the interface Input"
+                                << std::endl;
+    }
+    
+    mtsInterfaceProvided* control = NULL;
+    control = AddInterfaceProvided( "Control" );
+    if( control != NULL ){
+        control->AddCommandVoid( &mtsJR3ForceSensor::Zero, this, "Zero" );
+    }
+    else{
+        CMN_LOG_CLASS_RUN_ERROR << "Failed to create the interface Control."
+                                << std::endl;
+    }
+    
 }
 
 mtsJR3ForceSensor::~mtsJR3ForceSensor()
-{
-    if (PCI)
-        delete PCI;
+{ jr3.Close(); }
+
+void mtsJR3ForceSensor::Zero(){
+
+    vctFrame4x4<double> Rtws;
+
+    prmPositionJointGet prmq;
+    GetRobotJoint( prmq );
+        
+    bool valid = false;
+    prmq.GetValid( valid );
+    if( valid ){
+
+        vctDynamicVector<double> vctq;
+        prmq.GetPosition( vctq );
+        Rtws = robot.ForwardKinematics( vctq );
+        
+    }
+
+    jr3.Zero( Rtws );
+    
 }
 
-void mtsJR3ForceSensor::ReadRawFT(FTReading & ft) const 
-{
-    ft = PCI->ReadFilteredFT(0);
+void mtsJR3ForceSensor::Read( prmForceCartesianGet& prmft ) const {
+    
+    osaJR3ForceSensor::Wrench w;
+    if( jr3.Read( w, false, 2 ) != osaJR3ForceSensor::ESUCCESS ){
+        bool valid = false;
+        prmft.SetValid( valid );
+    }
+    else{
+        bool valid = true;
+        prmft.SetValid( valid );
+        prmft.SetForce( w );
+    }
+
 }
 
-void mtsJR3ForceSensor::ReadFilteredFT(const int & filterId, FTReading & ft) const 
-{
-    ft = PCI->ReadFilteredFT(filterId);
+void mtsJR3ForceSensor::ReadTransformed( prmForceCartesianGet& prmft ) const {
+
+    osaJR3ForceSensor::Wrench w;
+    if( jr3.Read( w, true, 2 ) != osaJR3ForceSensor::ESUCCESS ){
+        bool valid = false;
+        prmft.SetValid( valid );
+    }
+    else{
+        bool valid = true;
+        prmft.SetValid( valid );
+        prmft.SetForce( w );
+    }
+    
 }
 
-void mtsJR3ForceSensor::ReadErrorCount(unsigned int & errorCount) const
-{
-    errorCount = PCI->ReadErrorCount();
+void mtsJR3ForceSensor::ReadToolComp( prmForceCartesianGet& prmft ) const {
+    
+    //prmPositionCartesianGet prmRt;
+    //GetToolPosition( prmRt );
+
+    prmPositionJointGet prmq;
+    GetRobotJoint( prmq );
+
+
+    bool valid = false;
+    prmq.GetValid( valid );
+
+    if( valid ){
+
+        vctDynamicVector<double> vctq;
+        prmq.GetPosition( vctq );
+
+        vctFrame4x4<double> Rt = robot.ForwardKinematics( vctq );
+        vctQuaternionRotation3<double> q( Rt.Rotation(), VCT_NORMALIZE );
+        vctMatrixRotation3<double> R( q, VCT_NORMALIZE );
+
+        osaJR3ForceSensor::Wrench w;
+        if( jr3.Read( w, R, true, 2 ) != osaJR3ForceSensor::ESUCCESS ){
+            bool valid = false;
+            prmft.SetValid( valid );
+        }
+        else{
+            bool valid = true;
+            prmft.SetValid( valid );
+            prmft.SetForce( w );
+        }
+
+    }
+
 }
 
-void mtsJR3ForceSensor::ReadWarning(unsigned int & warning) const
-{
-    warning = PCI->ReadWarning();
-}
-
-void mtsJR3ForceSensor::ReadError(unsigned int & error) const
-{
-    error = PCI->ReadError();
-}

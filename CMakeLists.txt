@@ -16,12 +16,13 @@
 # --- end cisst license ---
 
 # To find FindMicroScribe.cmake
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/code)
 
-find_package(COMEDI REQUIRED)
+set(
+  CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH}
+  ${CMAKE_CURRENT_SOURCE_DIR}/code/cmake/Modules
+  )
 
-if (COMEDI_FOUND)
-  include_directories (${CMAKE_CURRENT_BINARY_DIR} ${MICROSCRIBE_INCLUDE_DIR})
-  add_subdirectory (code)
-  add_subdirectory (examples)
-endif (COMEDI_FOUND)
+project( sawJR3ForceSensor )
+add_subdirectory( code )
+add_subdirectory( examples )
