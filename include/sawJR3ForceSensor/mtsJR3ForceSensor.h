@@ -48,11 +48,15 @@ class CISST_EXPORT mtsJR3ForceSensor : public mtsComponent{
     robManipulator robot;
 
  protected:
-    
+
+    //! Set bias (zero reading)
     void Zero();
 
+    //! Read ft readings
     void Read( prmForceCartesianGet& prmft ) const ;
+    //! Read ft transformed to tip frame
     void ReadTransformed( prmForceCartesianGet& prmft ) const ;
+    //! Read ft with tool compensation and transformed to tip frame
     void ReadToolComp( prmForceCartesianGet& prmft ) const ;
     
  public:

@@ -343,7 +343,22 @@ osaJR3ForceSensor::US2SI
 
 osaJR3ForceSensor::vctAdjoint 
 osaJR3ForceSensor::Adjoint
-( const vctFrame4x4<double>& Rt ){
+( const vctFrame4x4<double>& Rt )
+{
+    /*
+      // Craig 3rd Edition Eq. 5.105
+      [f1 t1]' = [R12 0; skew(P12)*R12 R12] * [f2 t2]'
+
+      [f1 t1]: force torque w.r.t. frame 1
+      [f2 t2]: force torque w.r.t. frame 2
+      T12 = [R12 t12]: frame 2 w.r.t. frame 1
+
+      Force Sensor:
+        T12 = Rt, frame 1: JR3 frame, frame 2: tip frame,
+        so it's an inverse problem:
+        
+        [f2 t2]' = [R12' 0; -R12'*skew(P12) R12'] * [f1 t1]'
+     */
     
     vctFixedSizeMatrix<double,3,3> RT( 0.0 );
     

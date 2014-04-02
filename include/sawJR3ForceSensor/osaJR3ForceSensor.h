@@ -38,7 +38,7 @@ public:
 
     enum Errno { ESUCCESS, EFAILURE };
 
-	// Typedef for force and torque readings
+    // Typedef for force and torque readings
     typedef vctFixedSizeVector< double, 6 > Wrench;
     typedef vctFixedSizeMatrix< double, 6, 6 > vctAdjoint;
 
@@ -49,21 +49,29 @@ private:
     struct Internals;
     osaJR3ForceSensor::Internals* internals;
 
-    Units units;
+    Units units;    // unit standard
 
-    Wrench bias;
+    Wrench bias;    // bias wrench
 
-    vctFrame4x4<double> Rtst;
+    vctFrame4x4<double> Rtst;  // force tip w.r.t. JR3 frame
 
-    double mass;
-    vctFixedSizeVector<double,3> com;
+    double mass;    // tool mass
+    vctFixedSizeVector<double,3> com;  // tool center of mass
 
 public:
     
-    //
+    //! Default constructor
     osaJR3ForceSensor(){}
 
-    //! Constructors
+    //! \brief Constructors
+    /** 
+     * @param name  device name e.g. /dev/comedi0
+     * @param u     unit standard, default metric
+     * @param bias  bias wrenchw
+     * @param Rtst  
+     * @param mass  tool mass
+     * @param com   tool center of mass
+     */
     osaJR3ForceSensor( const std::string& name,
                        Units u = METRIC,
                        const osaJR3ForceSensor::Wrench& bias = Wrench( 0.0 ),
@@ -82,12 +90,23 @@ public:
     
     
     //! Read with tool compenstation
+    /**
+     * @param[out] wrench  wrench data from sensor
+     * @param R            tool orientation
+     * @param transform    tranform wrench data to tip if set to true
+     * @param filterId     comedi filter ID
+     */
     osaJR3ForceSensor::Errno Read( osaJR3ForceSensor::Wrench& wrench,
                                    const vctMatrixRotation3<double>& R,
                                    bool transform = true,
                                    int filterId = 0 ) const;
         
     //! Read without tool compenstation
+    /**
+     * @param[out] wrench  wrench data from sensor
+     * @param transform    tranform wrench data to tip if set to true
+     * @param filterId     comedi filter ID
+     */
     osaJR3ForceSensor::Errno Read( osaJR3ForceSensor::Wrench& wrench,
                                    bool transform = true,
                                    int filterId = 0 ) const;
@@ -102,6 +121,12 @@ public:
     void SetBias( const Wrench& vw ) { bias = vw; }
 
     //! Set bias
+    /**
+     * This method computes bias wrench and updates bias value. It
+     * compensates tool mass, thus need tool transform. 
+     * 
+     * @param Rtws current tool transform 
+     */
     void Zero( const vctFrame4x4<double>& Rtws );
 
     //! Set frame transformation
@@ -113,7 +138,7 @@ public:
     //! Compensate for tool mass
     Wrench CompensateToolMass( const vctMatrixRotation3<double>& R ) const;
 
-    //
+    //! Compute adjoint matrix of Rt
     static vctAdjoint Adjoint( const vctFrame4x4<double>& Rt );
 
 };
