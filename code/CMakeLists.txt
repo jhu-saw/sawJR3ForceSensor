@@ -20,7 +20,7 @@ set( REQUIRED_CISST_LIBRARIES cisstCommon
                               cisstOSAbstraction
                               cisstParameterTypes
                               cisstMultiTask
-			      cisstRobot )
+                              cisstRobot )
 
 find_package( cisst REQUIRED ${REQUIRED_CISST_LIBRARIES} )
 
@@ -35,9 +35,9 @@ if( cisst_FOUND_AS_REQUIRED )
     "${LIBRARY_OUTPUT_PATH}")
 
   set( 
-    HEADER_FILE_NAMES 
-    ${sawJR3ForceSensor_SOURCE_DIR}/include/osaJR3ForceSensor.h
-    ${sawJR3ForceSensor_SOURCE_DIR}/include/mtsJR3ForceSensor.h )
+    HEADER_FILES
+    ${sawJR3ForceSensor_INCLUDE_DIR}/sawJR3ForceSensor/osaJR3ForceSensor.h
+    ${sawJR3ForceSensor_INCLUDE_DIR}/sawJR3ForceSensor/mtsJR3ForceSensor.h )
   set( SOURCE_FILES osaJR3ForceSensor.cpp mtsJR3ForceSensor.cpp )
   
   add_library( 
@@ -57,9 +57,9 @@ if( cisst_FOUND_AS_REQUIRED )
     if( COMEDI_FOUND )
       
       set(
-	sawJR3ForceSensor_INCLUDE_DIRS 
-	${sawJR3ForceSensor_INCLUDE_DIR} 
-	${COMEDI_INCLUDE_DIR} )
+        sawJR3ForceSensor_INCLUDE_DIRS 
+        ${sawJR3ForceSensor_INCLUDE_DIR} 
+        ${COMEDI_INCLUDE_DIR} )
       
       set( sawJR3ForceSensor_LIBRARIES sawJR3ForceSensor ${COMEDI_LIBRARY} )
       target_link_libraries( sawJR3ForceSensor ${COMEDI_LIBRARY} )
