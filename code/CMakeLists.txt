@@ -72,7 +72,7 @@ if( cisst_FOUND_AS_REQUIRED )
       
   configure_file( 
     "${CMAKE_CURRENT_SOURCE_DIR}/sawJR3ForceSensorConfig.cmake.in"
-    "${sawComponents_BINARY_DIR}/sawJR3ForceSensorConfig.cmake"
+    "${sawJR3ForceSensor_BINARY_DIR}/sawJR3ForceSensorConfig.cmake"
     @ONLY@ )
 
   cisst_target_link_libraries( sawJR3ForceSensor ${REQUIRED_CISST_LIBRARIES} )
