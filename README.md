@@ -1,11 +1,15 @@
 sawJR3ForceSensor
 =================
 
-### Hardware 
+#### License
+CISST License:  
+https://github.com/jhu-cisst/cisst/blob/master/license.txt
+
+#### Hardware 
 * JR3 (Model number ?)
 * PCI Card: comes with JR3 force sensor
 
-### Driver 
+#### Driver 
 **Build**   
 sawJR3ForceSensor depends on CISST library.  
 The easist way is to get cisst-saw. Turn on 
@@ -18,5 +22,5 @@ The easist way is to get cisst-saw. Turn on
 * Linux 
 * QNX 
 
-### TODO
+#### TODO
 * ROS Support & Example
