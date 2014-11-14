@@ -19,8 +19,14 @@ The easist way is to get cisst-saw. Turn on
 
 
 **Supported System** 
-* Linux 
-* QNX 
+* Linux with Comedi 
+* QNX (Not sure check with Min)
+
+**Notes** 
+* JR3 uses left-hand coordinate frame and US unit
+* Reported FT in SI unit 
 
 #### TODO
+* Add Xenomai Support 
+  * http://xenomai.org/analogy-general-presentation/
 * ROS Support & Example
